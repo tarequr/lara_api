@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
 
@@ -16,7 +17,6 @@ class UserController extends Controller
     {
         try {
             $users = User::all();
-
             return response([
                 'users'   => $users,
                 'message' => 'success'
@@ -46,7 +46,21 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+            return response([
+                'user'    => $user,
+                'message' => 'User created successfully!'
+            ]);
+        } catch (\Throwable $th) {
+            return response([
+                'message' => $th->getMessage()
+            ]);
+        }
     }
 
     /**
