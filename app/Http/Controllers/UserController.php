@@ -50,7 +50,7 @@ class UserController extends Controller
             $user = User::create([
                 'name'     => $request->name,
                 'email'    => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($request->password)
             ]);
             return response([
                 'user'    => $user,
@@ -94,7 +94,22 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $user = User::findOrFail($id);        
+            $user->update([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password)
+            ]);
+            return response([
+                'user'    => $user,
+                'message' => 'User created successfully!'
+            ]);
+        } catch (\Throwable $th) {
+            return response([
+                'message' => $th->getMessage()
+            ]);
+        }
     }
 
     /**
