@@ -18,3 +18,4 @@ use App\Http\Controllers\UserController;
 Route::get('/users',[UserController::class,'index'])->name('user.index');
 Route::post('/users/store',[UserController::class,'store'])->name('user.store');
 Route::put('/users/update/{id}',[UserController::class,'update'])->name('user.update');
+Route::delete('/users/destroy/{id}',[UserController::class,'destroy'])->name('user.destroy');

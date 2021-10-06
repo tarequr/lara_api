@@ -103,7 +103,7 @@ class UserController extends Controller
             ]);
             return response([
                 'user'    => $user,
-                'message' => 'User created successfully!'
+                'message' => 'User updated successfully!'
             ]);
         } catch (\Throwable $th) {
             return response([
@@ -120,6 +120,15 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            User::findOrFail($id)->delete();
+            return response([
+                'message' => "User deleted successfully!."
+            ]);
+        } catch (\Throwable $th) {
+            return response([
+                'message' => $th->getMessage()
+            ]);
+        }
     }
 }
