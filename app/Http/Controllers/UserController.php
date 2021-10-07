@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\User;
+
 
 class UserController extends Controller
 {
@@ -46,6 +48,20 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        /* start validation part */
+        $validator = Validator::make($request->all(),[
+            'name'     => 'required|string',
+            'email'    => 'required|email',
+            'password' => 'required|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response([
+                'message' => $validator->errors()->all()
+            ]);
+        }
+        /* end validation part */
+
         try {
             $user = User::create([
                 'name'     => $request->name,
@@ -94,6 +110,20 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        /* start validation part */
+        $validator = Validator::make($request->all(),[
+            'name'     => 'required|string',
+            'email'    => 'required|email',
+            'password' => 'required|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response([
+                'message' => $validator->errors()->all()
+            ]);
+        }
+        /* end validation part */
+
         try {
             $user = User::findOrFail($id);        
             $user->update([
