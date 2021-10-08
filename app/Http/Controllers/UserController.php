@@ -82,7 +82,6 @@ class UserController extends Controller
             'email'    => 'required|email',
             'password' => 'required|min:6',
             'gendar'   => 'required',
-            'avatar'   => 'required|image',
         ]);
 
         if ($validator->fails()) {
