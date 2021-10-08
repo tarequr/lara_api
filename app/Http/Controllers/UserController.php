@@ -46,6 +46,23 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+
+    // private function getImage(Request $request)
+    // {
+    //     /* start image part */
+    //     if ($request->hasFile('avatar')) {
+    //         $file = $request->file('avatar');
+    //         $filename = date('YmdHi').$file->getClientOriginalName();
+    //         $file->move(public_path('upload/user_image'),$filename);
+    //     }else{
+    //         return response([
+    //             'message' => 'please select a image.'
+    //         ]);
+    //     }
+    //     /* end image part */
+    // }
+
     public function store(Request $request)
     {
         /* start validation part */
@@ -53,6 +70,8 @@ class UserController extends Controller
             'name'     => 'required|string',
             'email'    => 'required|email',
             'password' => 'required|min:6',
+            'gendar'   => 'required',
+            'avatar'   => 'required|image',
         ]);
 
         if ($validator->fails()) {
@@ -63,11 +82,22 @@ class UserController extends Controller
         /* end validation part */
 
         try {
+            /* start image part */
+            if ($request->hasFile('avatar')) {
+                $file = $request->file('avatar');
+                $filename = 'IMG_'.date('YmdHi').'.'.$file->getClientOriginalExtension();
+                $file->move(public_path('upload/user_images'),$filename);
+            }
+            /* end image part */
+
             $user = User::create([
                 'name'     => $request->name,
                 'email'    => $request->email,
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'gendar'   => $request->gendar,
+                'avatar'   => $filename
             ]);
+
             return response([
                 'user'    => $user,
                 'message' => 'User created successfully!'
@@ -115,6 +145,8 @@ class UserController extends Controller
             'name'     => 'required|string',
             'email'    => 'required|email',
             'password' => 'required|min:6',
+            'gendar'   => 'required',
+            'avatar'   => 'required|image',
         ]);
 
         if ($validator->fails()) {
@@ -125,12 +157,25 @@ class UserController extends Controller
         /* end validation part */
 
         try {
-            $user = User::findOrFail($id);        
+            $user = User::findOrFail($id);
+            
+            /* start image part */
+            if ($request->hasFile('avatar')) {
+                $file = $request->file('avatar');
+                @unlink(public_path('upload/user_images/'.$user->avatar));
+                $filename = 'IMG_'.date('YmdHi').'.'.$file->getClientOriginalExtension();
+                $file->move(public_path('upload/user_images'),$filename);
+            }
+            /* end image part */
+
             $user->update([
                 'name'     => $request->name,
                 'email'    => $request->email,
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'gendar'   => $request->gendar,
+                'avatar'   => $filename
             ]);
+
             return response([
                 'user'    => $user,
                 'message' => 'User updated successfully!'
@@ -151,7 +196,11 @@ class UserController extends Controller
     public function destroy($id)
     {
         try {
-            User::findOrFail($id)->delete();
+            $user = User::findOrFail($id);
+            if (file_exists('upload/user_images/' . $user->avatar) AND ! empty($user->avatar)) {
+                unlink('upload/user_images/' . $user->avatar);
+            }
+            $user->delete();
             return response([
                 'message' => "User deleted successfully!."
             ]);
